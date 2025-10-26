@@ -11,6 +11,7 @@
 #include <stdbool.h>
 
 bool BIND_Flag = false;
+float balance_P = 0, balance_R = 0, balance_Y = 0;
 
 void Menu_Start(void)
 {
@@ -378,8 +379,11 @@ void Menu_Balance_Set(void)
 {
     __Menu_Clear();
     OLED_ShowString(1, 12, "Pitch", OLED_6X8);
+    OLED_ShowFloatNum(61, 12, balance_P, 1, 2, OLED_6X8);
     OLED_ShowString(1, 22, "Roll", OLED_6X8);
+    OLED_ShowFloatNum(61, 22, balance_R, 1, 2, OLED_6X8);
     OLED_ShowString(1, 32, "Yaw", OLED_6X8);
+    OLED_ShowFloatNum(61, 32, balance_Y, 1, 2, OLED_6X8);
     OLED_ShowString(1, 42, "Back", OLED_6X8);
     OLED_ReverseArea(1, 12, 127, 8);
     OLED_Update();
@@ -402,15 +406,35 @@ void Menu_Balance_Set(void)
                 }
                 break;
             case Left:
-
+                if (index == 1) {
+                    balance_P -= 0.3;
+                    OLED_ShowFloatNum(61, 12, balance_P, 1, 2, OLED_6X8);
+                } else if (index == 2) {
+                    balance_R -= 0.3;
+                    OLED_ShowFloatNum(61, 22, balance_R, 1, 2, OLED_6X8);
+                } else if (index == 3) {
+                    balance_Y -= 0.3;
+                    OLED_ShowFloatNum(61, 32, balance_Y, 1, 2, OLED_6X8);
+                }
+                OLED_ReverseArea(61, 12 + (index - 1) * 10, 30, 8);
+                OLED_Update();
                 break;
             case Right:
-
+                if (index == 1) {
+                    balance_P += 0.3;
+                    OLED_ShowFloatNum(61, 12, balance_P, 1, 2, OLED_6X8);
+                } else if (index == 2) {
+                    balance_R += 0.3;
+                    OLED_ShowFloatNum(61, 22, balance_R, 1, 2, OLED_6X8);
+                } else if (index == 3) {
+                    balance_Y += 0.3;
+                    OLED_ShowFloatNum(61, 32, balance_Y, 1, 2, OLED_6X8);
+                }
+                OLED_ReverseArea(61, 12 + (index - 1) * 10, 30, 8);
+                OLED_Update();
                 break;
             case Mid:
-                if (index == 1) {
-                    
-                } else if (index == 4) {
+                if (index == 4) {
                     index = 1;
                     __Menu_One_ShowIndex(index, 0);
                     __Menu_Clear();
