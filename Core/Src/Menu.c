@@ -62,15 +62,15 @@ uint8_t __Menu_BIND_Searching(void)
     TX_Buf[0] = BIND_START;
     OLED_ShowImage(75, 40, 8, 8, Dot);
     OLED_UpdateArea(75, 40, 8, 8);
-    Delay_ms(300);
+    Delay_ms(250);
     if (H24_SendData()) { 
         OLED_ClearArea(75, 40, 28, 8);
         OLED_UpdateArea(75, 40, 28, 8);
-        return 1; 
+        return 1;                   //发送成功立刻返回1，退出函数
     }
     OLED_ShowImage(85, 40, 8, 8, Dot);
     OLED_UpdateArea(85, 40, 8, 8);
-    Delay_ms(300);
+    Delay_ms(250);
     if (H24_SendData()) { 
         OLED_ClearArea(75, 40, 28, 8);
         OLED_UpdateArea(75, 40, 28, 8);
@@ -78,7 +78,7 @@ uint8_t __Menu_BIND_Searching(void)
     }
     OLED_ShowImage(95, 40, 8, 8, Dot);
     OLED_UpdateArea(95, 40, 8, 8);
-    Delay_ms(300);
+    Delay_ms(250);
     if (H24_SendData()) { 
         OLED_ClearArea(75, 40, 28, 8);
         OLED_UpdateArea(75, 40, 28, 8);
@@ -86,11 +86,11 @@ uint8_t __Menu_BIND_Searching(void)
     }
     OLED_ClearArea(75, 40, 28, 8);
     OLED_UpdateArea(75, 40, 28, 8);
-    Delay_ms(300);
+    Delay_ms(250);
     if (H24_SendData()) { 
         return 1; 
     }
-    return 0;
+    return 0;       //四次发送失败返回0
 }
 
 void __Menu_One_ShowIndex(uint8_t index, uint8_t state)
@@ -207,12 +207,12 @@ void Menu_BIND(void)
                 OLED_UpdateArea(110, 1, 12, 8);
                 Delay_ms(500);
                 TX_Buf[0] = BIND_OK;
-                get_time = current_time;
+                get_time = current_time;        //将接收到信息的时间同步至当前时间
                 BIND_Flag = true;
                 break;
             }
             cnt++;
-            if (cnt > 4) {                  //尝试对码4次，失败则显示×
+            if (cnt > 4) {                  //尝试对码4次，失败则显示"×"
                 cnt = 0;
                 TX_Buf[0] = 0x00;
                 OLED_DrawLine(81, 34, 99, 52);
@@ -406,32 +406,58 @@ void Menu_Balance_Set(void)
                 }
                 break;
             case Left:
-                if (index == 1) {
-                    balance_P -= 0.3;
-                    OLED_ShowFloatNum(61, 12, balance_P, 1, 2, OLED_6X8);
-                } else if (index == 2) {
-                    balance_R -= 0.3;
-                    OLED_ShowFloatNum(61, 22, balance_R, 1, 2, OLED_6X8);
-                } else if (index == 3) {
-                    balance_Y -= 0.3;
-                    OLED_ShowFloatNum(61, 32, balance_Y, 1, 2, OLED_6X8);
+                if (BIND_Flag) {
+                    if (index == 1) {
+                        balance_P -= 0.3;
+                        OLED_ShowFloatNum(61, 12, balance_P, 1, 2, OLED_6X8);
+                    } else if (index == 2) {
+                        balance_R -= 0.3;
+                        OLED_ShowFloatNum(61, 22, balance_R, 1, 2, OLED_6X8);
+                    } else if (index == 3) {
+                        balance_Y -= 0.3;
+                        OLED_ShowFloatNum(61, 32, balance_Y, 1, 2, OLED_6X8);
+                    }
+                    OLED_ReverseArea(61, 12 + (index - 1) * 10, 30, 8);
+                    OLED_Update();
+                } else {
+                    if (index != 4) {
+                        for (uint8_t i = 0; i < 3; i++) {
+                            OLED_ShowString(33, 40, "No Signal!", OLED_8X16);
+                            OLED_UpdateArea(33, 40, 80, 16);
+                            Delay_ms(100);
+                            OLED_ClearArea(33, 40, 80, 16);
+                            OLED_UpdateArea(33, 40, 80, 16);
+                            Delay_ms(100);
+                        }
+                    }
                 }
-                OLED_ReverseArea(61, 12 + (index - 1) * 10, 30, 8);
-                OLED_Update();
                 break;
             case Right:
-                if (index == 1) {
-                    balance_P += 0.3;
-                    OLED_ShowFloatNum(61, 12, balance_P, 1, 2, OLED_6X8);
-                } else if (index == 2) {
-                    balance_R += 0.3;
-                    OLED_ShowFloatNum(61, 22, balance_R, 1, 2, OLED_6X8);
-                } else if (index == 3) {
-                    balance_Y += 0.3;
-                    OLED_ShowFloatNum(61, 32, balance_Y, 1, 2, OLED_6X8);
+                if (BIND_Flag) {
+                    if (index == 1) {
+                        balance_P += 0.3;
+                        OLED_ShowFloatNum(61, 12, balance_P, 1, 2, OLED_6X8);
+                    } else if (index == 2) {
+                        balance_R += 0.3;
+                        OLED_ShowFloatNum(61, 22, balance_R, 1, 2, OLED_6X8);
+                    } else if (index == 3) {
+                        balance_Y += 0.3;
+                        OLED_ShowFloatNum(61, 32, balance_Y, 1, 2, OLED_6X8);
+                    }
+                    OLED_ReverseArea(61, 12 + (index - 1) * 10, 30, 8);
+                    OLED_Update();
+                } else {
+                    if (index != 4) {
+                        for (uint8_t i = 0; i < 3; i++) {
+                            OLED_ShowString(33, 40, "No Signal!", OLED_8X16);
+                            OLED_UpdateArea(33, 40, 80, 16);
+                            Delay_ms(100);
+                            OLED_ClearArea(33, 40, 80, 16);
+                            OLED_UpdateArea(33, 40, 80, 16);
+                            Delay_ms(100);
+                        }
+                    }
                 }
-                OLED_ReverseArea(61, 12 + (index - 1) * 10, 30, 8);
-                OLED_Update();
                 break;
             case Mid:
                 if (index == 4) {

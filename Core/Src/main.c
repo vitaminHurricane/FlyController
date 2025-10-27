@@ -110,7 +110,7 @@ int main(void)
   HAL_TIM_Base_Start_IT(&htim2);
   HAL_TIM_Base_Start_IT(&htim3);
   HAL_ADCEx_Calibration_Start(&hadc1);
-  HAL_ADC_Start_DMA(&hadc1, (uint32_t *)Channel_Value, 4);
+  HAL_ADC_Start_DMA(&hadc1, (uint32_t *)Channel_Value, 4);    //开启摇杆数模转换
   /* USER CODE END 2 */
 
   /* Infinite loop */

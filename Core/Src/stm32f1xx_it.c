@@ -276,8 +276,8 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
       cnt = 0;
     }
     if (BIND_Flag) { 
-      if (fabs(current_time - get_time) >= 200) {
-        BIND_Flag = false;
+      if (fabs(current_time - get_time) >= 400) {       //对码成功后在定时中断中定期检查上一次接收发送信息成功的时间与当前时间的时间差
+        BIND_Flag = false;                              //若时间差超过400ms则判断与飞机断连，BIND_Flag标志位置0，不再发送数据
         OLED_ShowImage(110, 1, 12, 8, No_Signal);
         OLED_UpdateArea(110, 1, 12, 8);
       }
@@ -285,7 +285,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
   } else if (htim == &htim3) {
     static uint8_t cnt = 0;
     cnt++;
-    if (cnt > 30) {
+    if (cnt > 20) {
       HAL_ADC_Start_DMA(&hadc1, (uint32_t *)Channel_Value, 4);
       Swith_Channel_Res();
       if (BIND_Flag) {                  //如果对码成功，则每隔20ms发送一次油门数据
