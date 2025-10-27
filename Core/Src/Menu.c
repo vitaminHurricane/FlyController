@@ -462,6 +462,13 @@ void Menu_Balance_Set(void)
             case Mid:
                 if (index == 4) {
                     index = 1;
+                    if (BIND_Flag) {    //如果对码成功，退出之后自动发送更改过后的无人机平衡点，无论是否变动
+                        BIND_Flag = false; //先置对码标志位为0，防止发送平衡点数据时被摇杆数据覆盖
+                        TX_Buf[0] = 0x03;
+                        
+
+                        BIND_Flag = true;  //发送完调节过后的平衡点数据后再重新置对码标志位为1，重新摇杆数据的发送
+                    }
                     __Menu_One_ShowIndex(index, 0);
                     __Menu_Clear();
                     goto out;
